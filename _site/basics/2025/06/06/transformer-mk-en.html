@@ -57,7 +57,7 @@
   <li>SentencePiece</li>
   <li>Token Eembeddings</li>
   <li>Position Eembedding</li>
-  <li>Attention</li>
+  <li>Внимание</li>
   <li>Transformer</li>
   <li>Multi-Head Attention</li>
   <li>Тренирање</li>
@@ -67,12 +67,71 @@
 
 <hr />
 
-<ol>
-  <li>Целта на целиот проект е да научиме како функционира ‘Transformer’ архитектурата, која се користи во LLMs како GPT, Claude, Grok, LLAMA, Mistral, Deepseek …</li>
-</ol>
+<p><br /></p>
+
+<h2 id="0-вовед">0. Вовед</h2>
+
+<p>Целта на овој блог е да научиме како функционира <b>Transformer</b> архитектурата, која се користи во Large Language Models како GPT, Claude, Mistral, LLAMA…</p>
+
+<p>Секако нашата имплементација тука ќе биде <b>многу пати поедноставна </b>, примарно базирана врз оригиналниот труд <a href="">Attention is All You Need</a>.</p>
+
+<p>Исто целта <b>нема</b> да биди Generative Pretrained Transformer или имплементација на цел LLM туку со помош <b>Sequence to Sequence Vanilla Transformer</b> ќе можиме да преведуваме текст.</p>
+
+<div style="background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+    <strong>⚠️ Мало Предупредување:</strong>
+
+    <br />
+    <br />
+
+        Овој блог е пишуван од студенти, сеуште го проучуваме сето ова на блогот.
+
+  <br />
+  <br />
+
+  Сигурни сме дека имаме некаде грешка. Очекувајте грешки како граматички и нестандарден јазик.
+
+  <br />
+  <br />
+
+  <b>Отворени сме на конструктивни критики</b>
+
+  <br />
+  <br />
+  Доколку пронајдите какви било грешки слободно контактирајте не.
+
+  <br />
+  <br />
+  Благодариме :)
+</div>
+
+<p><a href="">Seq2Seq</a> се користи за обработка на природни јазици <a href="https://mk.wikipedia.org/wiki/%D0%9E%D0%B1%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0_%D0%BD%D0%B0_%D0%BF%D1%80%D0%B8%D1%80%D0%BE%D0%B4%D0%BD%D0%B8_%D1%98%D0%B0%D0%B7%D0%B8%D1%86%D0%B8">NLP</a>.</p>
+
+<p>Во нашиот случај ќе го користиме за <b>превод од македонски на англиски</b>, мислиме дека е добар баланс помеѓу нешто што е <b> корисно да направиме за нашиот мајчин јазик</b> ,нешто што <b> не е само теорија</b> и нешто што <b>може да се научи</b>, три во едно :)</p>
+
+<p>Пред да се појави трансформер архитектурата, <b>механизмите за “внимание”</b> биле ограничени со <a href="">GRU</a> или <a href="">LSTM</a> и користењето на <a href="">RNN-Recurrent Neural Networks</a>.</p>
+
+<h2 id="1-токен">1. Токен</h2>
+
+<p>Овој збор кај нас би бил преведен како <b>лексема</b> или <b>жетон</b>, во англиската литература e дефиниран како <b>атомична (неделива) единица за репрезентација нa текст.</b> (искрено не сме сигурни дали го имаат истото значење).</p>
+
+<p>Должината на оваа единица е <b>произволна</b> и зависи од проблемот што сакаме да го решиме.</p>
+
+<p>Се сретнува во повеќе должини:</p>
+<ul>
+  <li>како <b>дел од збор</b> (пример во вистински јазик би биле слоговите).</li>
+  <li>Како <b>збор</b>(пример: <b>здраво</b>).</li>
+  <li>како <b>карактер</b> (пример: <b>а</b>).</li>
+  <li>како <b>Бајт</b> (пример: <b>ASCII</b> или <b>UTF</b> енкодиран карактер).</li>
+</ul>
+
+<p><br /></p>
+
+<h3 id="токен-ид-token-id">Токен ИД (Token ID)</h3>
+
+<!--
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">print</span><span class="p">(</span><span class="s">'is the syntax working?'</span><span class="p">)</span></code></pre></figure>
-
+ -->
 
   </div><a class="u-url" href="/basics/2025/06/06/transformer-mk-en.html" hidden></a>
 </article>

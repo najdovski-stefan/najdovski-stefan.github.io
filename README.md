@@ -1,1 +1,1 @@
-# just a technical blog about coding and explaining concepts
+blog about coding and explaining concepts

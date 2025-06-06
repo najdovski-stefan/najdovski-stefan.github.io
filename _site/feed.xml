@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-06-06T16:19:39+02:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Денес Нешто Научив</title><subtitle></subtitle><entry><title type="html">Имплементациjа на Трансформер Архитектурата за Македонско-Англиски Превод На Реченици</title><link href="http://localhost:4000/basics/2025/06/06/transformer-mk-en.html" rel="alternate" type="text/html" title="Имплементациjа на Трансформер Архитектурата за Македонско-Англиски Превод На Реченици" /><published>2025-06-06T09:32:32+02:00</published><updated>2025-06-06T09:32:32+02:00</updated><id>http://localhost:4000/basics/2025/06/06/transformer-mk-en</id><content type="html" xml:base="http://localhost:4000/basics/2025/06/06/transformer-mk-en.html"><![CDATA[<p><br /></p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-06-06T17:35:22+02:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Денес Нешто Научив</title><subtitle></subtitle><entry><title type="html">Имплементациjа на Трансформер Архитектурата за Македонско-Англиски Превод На Реченици</title><link href="http://localhost:4000/basics/2025/06/06/transformer-mk-en.html" rel="alternate" type="text/html" title="Имплементациjа на Трансформер Архитектурата за Македонско-Англиски Превод На Реченици" /><published>2025-06-06T09:32:32+02:00</published><updated>2025-06-06T09:32:32+02:00</updated><id>http://localhost:4000/basics/2025/06/06/transformer-mk-en</id><content type="html" xml:base="http://localhost:4000/basics/2025/06/06/transformer-mk-en.html"><![CDATA[<p><br /></p>
 
 <hr />
 
@@ -59,7 +59,7 @@
     <br />
     <br />
 
-        Овој блог е пишуван од студенти, сеуште ги проучуваме детално сите идеи презентирани на блогот
+        Овој блог е пишуван од студенти, сè уште ги проучуваме детално сите идеи презентирани на блогот
 
   <br />
   <br />
@@ -107,6 +107,7 @@
 
 <div style="background-color: #ff0000; color: #ffffff; border: 1px solid #ffeeba; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
     <strong>⚠️  Предупредување:</strong>
+    <br />
     <br />
     Моделот е лиценциран под
     <a href="https://www.creativecommons.org/licenses/by-nc/4.0/deed.en" target="_blank" style="color: #ffffff; text-decoration: underline;">

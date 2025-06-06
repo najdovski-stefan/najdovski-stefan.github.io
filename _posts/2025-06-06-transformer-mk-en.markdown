@@ -62,15 +62,13 @@ categories: basics
 Пред да се појави трансформер архитектурата, <b>механизмите за "внимание"</b> биле ограничени со [GRU]() или [LSTM]() и користењето на [RNN-Recurrent Neural Networks]().
 
 
-
-
 <div style="background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
     <strong>⚠️ Мало Предупредување:</strong>
 
     <br>
     <br>
 
-        Овој блог е пишуван од студенти, сеуште ги проучуваме детално сите идеи презентирани на блогот
+        Овој блог е пишуван од студенти, сè уште ги проучуваме детално сите идеи презентирани на блогот
 
   <br>
   <br>
@@ -119,6 +117,7 @@ categories: basics
 
 <div style="background-color: #ff0000; color: #ffffff; border: 1px solid #ffeeba; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
     <strong>⚠️  Предупредување:</strong>
+    <br>
     <br>
     Моделот е лиценциран под
     <a href="https://www.creativecommons.org/licenses/by-nc/4.0/deed.en" target="_blank" style="color: #ffffff; text-decoration: underline;">

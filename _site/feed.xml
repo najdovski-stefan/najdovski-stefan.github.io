@@ -1,17 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-06-06T09:49:40+02:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Developer Log</title><subtitle></subtitle><entry><title type="html">Welcome to Jekyll!</title><link href="http://localhost:4000/jekyll/update/2025/06/06/welcome-to-jekyll.html" rel="alternate" type="text/html" title="Welcome to Jekyll!" /><published>2025-06-06T09:32:32+02:00</published><updated>2025-06-06T09:32:32+02:00</updated><id>http://localhost:4000/jekyll/update/2025/06/06/welcome-to-jekyll</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2025/06/06/welcome-to-jekyll.html"><![CDATA[<p>You’ll find this post in your <code class="language-plaintext highlighter-rouge">_posts</code> directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run <code class="language-plaintext highlighter-rouge">jekyll serve</code>, which launches a web server and auto-regenerates your site when a file is updated.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-06-06T10:17:57+02:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Blog</title><subtitle></subtitle><entry><title type="html">Имплементациjа на Трансформер Архитектурата за Македонско-Англиски Превод На Реченици</title><link href="http://localhost:4000/basics/2025/06/06/transformer-mk-en.html" rel="alternate" type="text/html" title="Имплементациjа на Трансформер Архитектурата за Македонско-Англиски Превод На Реченици" /><published>2025-06-06T09:32:32+02:00</published><updated>2025-06-06T09:32:32+02:00</updated><id>http://localhost:4000/basics/2025/06/06/transformer-mk-en</id><content type="html" xml:base="http://localhost:4000/basics/2025/06/06/transformer-mk-en.html"><![CDATA[<h1 id="содржина">Содржина</h1>
 
-<p>Jekyll requires blog post files to be named according to the following format:</p>
+<ol>
+  <li>Вовед</li>
+  <li>Што е токен?</li>
+  <li>Речник</li>
+  <li>Токенизирање</li>
+  <li>SentencePiece</li>
+  <li>Token Eembeddings</li>
+  <li>Position Eembedding</li>
+  <li>Attention</li>
+  <li>Transformer</li>
+  <li>Multi-Head Attention</li>
+  <li>Тренирање</li>
+  <li>Резултати</li>
+  <li>Референци и Благодарност</li>
+</ol>
 
-<p><code class="language-plaintext highlighter-rouge">YEAR-MONTH-DAY-title.MARKUP</code></p>
+<hr />
 
-<p>Where <code class="language-plaintext highlighter-rouge">YEAR</code> is a four-digit number, <code class="language-plaintext highlighter-rouge">MONTH</code> and <code class="language-plaintext highlighter-rouge">DAY</code> are both two-digit numbers, and <code class="language-plaintext highlighter-rouge">MARKUP</code> is the file extension representing the format used in the file. After that, include the necessary front matter. Take a look at the source for this post to get an idea about how it works.</p>
+<ol>
+  <li>Целта на целиот проект е да научиме како функционира ‘Transformer’ архитектурата, која се користи во LLMs како GPT, Claude, Grok, LLAMA, Mistral, Deepseek …</li>
+</ol>
 
-<p>Jekyll also offers powerful support for code snippets:</p>
-
-<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">print_hi</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
-  <span class="nb">puts</span> <span class="s2">"Hi, </span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2">"</span>
-<span class="k">end</span>
-<span class="n">print_hi</span><span class="p">(</span><span class="s1">'Tom'</span><span class="p">)</span>
-<span class="c1">#=&gt; prints 'Hi, Tom' to STDOUT.</span></code></pre></figure>
-
-<p>Check out the <a href="https://jekyllrb.com/docs/home">Jekyll docs</a> for more info on how to get the most out of Jekyll. File all bugs/feature requests at <a href="https://github.com/jekyll/jekyll">Jekyll’s GitHub repo</a>. If you have questions, you can ask them on <a href="https://talk.jekyllrb.com/">Jekyll Talk</a>.</p>]]></content><author><name></name></author><category term="jekyll" /><category term="update" /><summary type="html"><![CDATA[You’ll find this post in your _posts directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run jekyll serve, which launches a web server and auto-regenerates your site when a file is updated.]]></summary></entry></feed>
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">print</span><span class="p">(</span><span class="s">'is the syntax working?'</span><span class="p">)</span></code></pre></figure>]]></content><author><name></name></author><category term="basics" /><summary type="html"><![CDATA[Содржина]]></summary></entry></feed>

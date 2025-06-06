@@ -23,6 +23,9 @@ categories: basics
 
 ---
 
+0. Целта на целиот проект е да научиме како функционира 'Transformer' архитектурата, која се користи во LLMs како GPT, Claude, Grok, LLAMA, Mistral, Deepseek ...
+
+
 {% highlight python %}
 print('is the syntax working?')
 {% endhighlight %}

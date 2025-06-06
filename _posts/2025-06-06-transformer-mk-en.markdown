@@ -12,7 +12,7 @@ categories: basics
 # Содржина
 
 0. Вовед
-1. Што е токен?
+1. [Што е токен?](#1-токен)
 2. Речник
 3. Токенизирање
 4. SentencePiece
@@ -123,10 +123,10 @@ categories: basics
     Моделот е лиценциран под
     <a href="https://www.creativecommons.org/licenses/by-nc/4.0/deed.en" target="_blank" style="color: #ffffff; text-decoration: underline;">
         Creative Commons Attribution Non Commercial 4.0
-    </a>.
+    </a>
     <br>
     <br>
-    Може да се користи за едукативни цели и истражувачки цели.
+    Моделот <b>МОЖЕ</b> да се користи за едукативни цели и истражувачки цели.
     <br>
     <br>
     Моделот <b>НЕ</b> може да биде користен во комерцијални продукти или цели на кој било начин.

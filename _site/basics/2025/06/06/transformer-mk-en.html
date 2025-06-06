@@ -3,26 +3,24 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>Имплементациjа на Трансформер Архитектурата за Македонско-Англиски Превод На Реченици | Blog</title>
+<title>Имплементациjа на Трансформер Архитектурата за Македонско-Англиски Превод На Реченици | Денес Нешто Научив</title>
 <meta name="generator" content="Jekyll v3.10.0" />
 <meta property="og:title" content="Имплементациjа на Трансформер Архитектурата за Македонско-Англиски Превод На Реченици" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Содржина" />
-<meta property="og:description" content="Содржина" />
 <link rel="canonical" href="http://localhost:4000/basics/2025/06/06/transformer-mk-en.html" />
 <meta property="og:url" content="http://localhost:4000/basics/2025/06/06/transformer-mk-en.html" />
-<meta property="og:site_name" content="Blog" />
+<meta property="og:site_name" content="Денес Нешто Научив" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2025-06-06T09:32:32+02:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Имплементациjа на Трансформер Архитектурата за Македонско-Англиски Превод На Реченици" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2025-06-06T09:32:32+02:00","datePublished":"2025-06-06T09:32:32+02:00","description":"Содржина","headline":"Имплементациjа на Трансформер Архитектурата за Македонско-Англиски Превод На Реченици","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/basics/2025/06/06/transformer-mk-en.html"},"url":"http://localhost:4000/basics/2025/06/06/transformer-mk-en.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2025-06-06T09:32:32+02:00","datePublished":"2025-06-06T09:32:32+02:00","headline":"Имплементациjа на Трансформер Архитектурата за Македонско-Англиски Превод На Реченици","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/basics/2025/06/06/transformer-mk-en.html"},"url":"http://localhost:4000/basics/2025/06/06/transformer-mk-en.html"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Blog" /></head>
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Денес Нешто Научив" /></head>
 <body><header class="site-header" role="banner">
 
-  <div class="wrapper"><a class="site-title" rel="author" href="/">Blog</a><nav class="site-nav">
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Денес Нешто Научив</a><nav class="site-nav">
         <input type="checkbox" id="nav-trigger" class="nav-trigger" />
         <label for="nav-trigger">
           <span class="menu-icon">
@@ -47,7 +45,11 @@
   </header>
 
   <div class="post-content e-content" itemprop="articleBody">
-    <h1 id="содржина">Содржина</h1>
+    <p><br /></p>
+
+<hr />
+
+<h1 id="содржина">Содржина</h1>
 
 <ol>
   <li>Вовед</li>
@@ -56,6 +58,7 @@
   <li>Токенизирање</li>
   <li>SentencePiece</li>
   <li>Token Eembeddings</li>
+  <li>Unigram Model</li>
   <li>Position Eembedding</li>
   <li>Внимание</li>
   <li>Transformer</li>
@@ -71,11 +74,31 @@
 
 <h2 id="0-вовед">0. Вовед</h2>
 
-<p>Целта на овој блог е да научиме како функционира <b>Transformer</b> архитектурата, која се користи во Large Language Models како GPT, Claude, Mistral, LLAMA…</p>
+<p>Целта на овој блог е да научиме како функционира <b>Transformer</b> архитектурата, делот кој ја направи науката за неуронски мрежи посериозна, се користи во Large Language Models како GPT, Claude, Mistral, LLAMA…</p>
 
-<p>Секако нашата имплементација тука ќе биде <b>многу пати поедноставна </b>, примарно базирана врз оригиналниот труд <a href="">Attention is All You Need</a>.</p>
+<p>На крајот има и <b>“demo”</b> од проектот, што може да се користи практично.</p>
 
-<p>Исто целта <b>нема</b> да биди Generative Pretrained Transformer или имплементација на цел LLM туку со помош <b>Sequence to Sequence Vanilla Transformer</b> ќе можиме да преведуваме текст.</p>
+<p>Секако нашата имплементација тука ќе биде <b>многу пати поедноставна </b>, но есенцијално идејата позади е иста, скоро целосно базирана врз оригиналниот труд <a href="https://arxiv.org/pdf/1706.03762">Attention is All You Need</a>.</p>
+
+<p>Целта на нашиот модел ќе биди <b>превод на текст</b>.</p>
+
+<p>Целта <b>нема</b> да биди:  Generative Pretrained Transformer (GPT), имплементација на целосен Large Language Model (LLM), ова е далеку покомплицирано и уште потешко за имплеметнација.</p>
+
+<p>Она што ќе го имплементираме, ќе биди:</p>
+
+<p><b>Sequence to Sequence Vanilla Transformer</b> или на кратко <b>Seq2Seq Transformer</b>.</p>
+
+<p>Ќе гледаме да балансираме со технички жаргони и да објасниме интуитивно и со примери за секој да може да не следи, ви препорачуваме да имате некоја блага основа за полесно следење, за тоа што е <b>Neural Network</b> и што е тоа <b>Natural Language Processing</b>, исто препорачливо е познавање на <b>основи на веројатност и статистика</b>.</p>
+
+<p><br /></p>
+
+<h3 id="sequence-to-sequence">Sequence to Sequence</h3>
+
+<p><a href="">Seq2Seq</a> се користи за обработка на природни јазици <a href="https://mk.wikipedia.org/wiki/%D0%9E%D0%B1%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0_%D0%BD%D0%B0_%D0%BF%D1%80%D0%B8%D1%80%D0%BE%D0%B4%D0%BD%D0%B8_%D1%98%D0%B0%D0%B7%D0%B8%D1%86%D0%B8">NLP</a>.</p>
+
+<p>Во нашиот случај ќе го користиме за <b>превод од македонски на англиски</b>, мислиме дека е добар баланс помеѓу нешто што е <b> корисно да направиме за нашиот мајчин јазик</b> ,нешто што <b> не е само теорија</b> и нешто што <b>може да се научи</b>, три во едно :)</p>
+
+<p>Пред да се појави трансформер архитектурата, <b>механизмите за “внимание”</b> биле ограничени со <a href="">GRU</a> или <a href="">LSTM</a> и користењето на <a href="">RNN-Recurrent Neural Networks</a>.</p>
 
 <div style="background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
     <strong>⚠️ Мало Предупредување:</strong>
@@ -83,7 +106,7 @@
     <br />
     <br />
 
-        Овој блог е пишуван од студенти, сеуште го проучуваме сето ова на блогот.
+        Овој блог е пишуван од студенти, сеуште ги проучуваме детално сите идеи презентирани на блогот
 
   <br />
   <br />
@@ -104,29 +127,45 @@
   Благодариме :)
 </div>
 
-<p><a href="">Seq2Seq</a> се користи за обработка на природни јазици <a href="https://mk.wikipedia.org/wiki/%D0%9E%D0%B1%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0_%D0%BD%D0%B0_%D0%BF%D1%80%D0%B8%D1%80%D0%BE%D0%B4%D0%BD%D0%B8_%D1%98%D0%B0%D0%B7%D0%B8%D1%86%D0%B8">NLP</a>.</p>
-
-<p>Во нашиот случај ќе го користиме за <b>превод од македонски на англиски</b>, мислиме дека е добар баланс помеѓу нешто што е <b> корисно да направиме за нашиот мајчин јазик</b> ,нешто што <b> не е само теорија</b> и нешто што <b>може да се научи</b>, три во едно :)</p>
-
-<p>Пред да се појави трансформер архитектурата, <b>механизмите за “внимание”</b> биле ограничени со <a href="">GRU</a> или <a href="">LSTM</a> и користењето на <a href="">RNN-Recurrent Neural Networks</a>.</p>
-
 <h2 id="1-токен">1. Токен</h2>
 
-<p>Овој збор кај нас би бил преведен како <b>лексема</b> или <b>жетон</b>, во англиската литература e дефиниран како <b>атомична (неделива) единица за репрезентација нa текст.</b> (искрено не сме сигурни дали го имаат истото значење).</p>
+<p>Овој збор кај нас би бил преведен како <b>лексема</b> или <b>жетон</b>, во англиската (програмерската) литература e дефиниран како <b>атомична (неделива) единица за репрезентација нa текст.</b> (искрено не сме сигурни дали го имаат истото значење на македонски или општо во лингвистиката).</p>
 
 <p>Должината на оваа единица е <b>произволна</b> и зависи од проблемот што сакаме да го решиме.</p>
 
 <p>Се сретнува во повеќе должини:</p>
 <ul>
-  <li>како <b>дел од збор</b> (пример во вистински јазик би биле слоговите).</li>
-  <li>Како <b>збор</b>(пример: <b>здраво</b>).</li>
-  <li>како <b>карактер</b> (пример: <b>а</b>).</li>
-  <li>како <b>Бајт</b> (пример: <b>ASCII</b> или <b>UTF</b> енкодиран карактер).</li>
+  <li><b>Реченица</b> (пример: Здраво Македонијо!)</li>
+  <li><b>Дел од збор</b> (пример во вистински јазик би биле слоговите).</li>
+  <li><b>Збор</b>(пример: <b>здраво</b>).</li>
+  <li><b>Карактер</b> (пример: <b>а</b>).</li>
+  <li><b>Бајт</b> (пример: <b>ASCII</b> или <b>UTF</b> енкодиран карактер).</li>
 </ul>
+
+<p>Ние ќе ги користиме Unigram Моделот.</p>
 
 <p><br /></p>
 
-<h3 id="токен-ид-token-id">Токен ИД (Token ID)</h3>
+<h2 id="3речник">3.Речник</h2>
+
+<h2 id="9внимание">9.Внимание</h2>
+
+<p>Концептот на <b>“Внимание”</b> е да го реши проблемот со преведување на текст, пред 20тина години овој проблем бил решаван со комплексни алгоритми кои имале бројни проблеми, наједноставниот проблем била самата <b>должина на речениците при превод</b>, тие се менуваат и стануваат уште по очигледни кога користиме јазици кои имаат различен начин на пишување, за повеќе околу проблемите од класичните начини на превод без корисење на неуронски мрежи можи да прочитате <a href="https://en.wikipedia.org/wiki/Statistical_machine_translation#Shortcomings">тука</a>.</p>
+
+<div style="background-color: #ff0000; color: #ffffff; border: 1px solid #ffeeba; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+    <strong>⚠️  Предупредување:</strong>
+    <br />
+    Моделот е лиценциран под
+    <a href="https://www.creativecommons.org/licenses/by-nc/4.0/deed.en" target="_blank" style="color: #ffffff; text-decoration: underline;">
+        Creative Commons Attribution Non Commercial 4.0
+    </a>.
+    <br />
+    <br />
+    Може да се користи за едукативни цели и истражувачки цели.
+    <br />
+    <br />
+    Моделот <b>НЕ</b> може да биде користен во комерцијални продукти или цели на кој било начин.
+</div>
 
 <!--
 
@@ -142,12 +181,12 @@
 
   <div class="wrapper">
 
-    <h2 class="footer-heading">Blog</h2>
+    <h2 class="footer-heading">Денес Нешто Научив</h2>
 
     <div class="footer-col-wrapper">
       <div class="footer-col footer-col-1">
         <ul class="contact-list">
-          <li class="p-name">Blog</li></ul>
+          <li class="p-name">Денес Нешто Научив</li></ul>
       </div>
 
       <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>

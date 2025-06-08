@@ -3,7 +3,7 @@ layout: post
 title:  "Имплементациjа На Трансформер Архитектурата За Македонско-Англиски Превод На Реченици"
 date:   2025-06-06 09:32:32 +0200
 categories: basics
-author: Stefan Najdovski, Hristijan Gorkov
+author: Стефан Најдовски, Христијан Горков
 ---
 
 <br>

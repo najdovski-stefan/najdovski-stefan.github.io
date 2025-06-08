@@ -10,6 +10,22 @@ author: Stefan Najdovski, Hristijan Gorkov
 
 ---
 
+<br>
+
+<div style="background-color: #ff0000; color: #ffffff; border: 1px solid #ffeeba; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+    <strong>⚠️  Блогот е во процес на пишување и валидација:</strong>
+    <br>
+    <br>
+        Ве молиме вратете се подоцна
+
+    <br>
+
+    Ви благодариме
+
+</div>
+
+---
+
 # Содржина
 
 0. [Вовед](#0-вовед)

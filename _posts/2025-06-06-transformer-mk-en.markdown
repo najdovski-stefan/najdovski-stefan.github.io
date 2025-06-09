@@ -137,7 +137,7 @@ author: Стефан Најдовски, Христијан Горков
   - <b>Карактер</b> (пример: <b>а</b>).
   - <b>Бајт</b> (пример: <b>ASCII</b> или <b>UTF</b> енкодиран карактер).
 
-![token](/assets/images/granularnost.png)
+![granularnost](/assets/images/granularnost.png)
 
 
 <br>
@@ -231,6 +231,9 @@ $$
 
 
 Позиционалните вградувања се користат за информирање на трансфомерот на која позиција се наоѓаат векторите за внес. Тие се додаваат на секоја вредност во векторот посебно,
+
+![granularnost](/assets/images/visualize.png)
+
 
 
 
@@ -349,10 +352,11 @@ print('is the syntax working?')
 
 ### Литература/Референци:
 - [Attention is All You need](https://arxiv.org/pdf/1706.03762).
+- [What Do Position Embeddings Learn?](https://arxiv.org/pdf/2010.04903)
 - [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/).
 - [Kemal Erdem, (May 2021). "Introduction to Attention Mechanism"](https://erdem.pl/2021/05/introduction-to-attention-mechanism)
 - [мал дел од dataset - ]
-
+- [theaisummer.com - Positional Embeddings](https://theaisummer.com/positional-embeddings/)
 
 <br>
 

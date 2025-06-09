@@ -164,6 +164,8 @@ author: Стефан Најдовски, Христијан Горков
 
  - ние го користиме <b>Unigram</b>, со помош на <b>sentencepiece</b> библиотеката.
 
+
+
 ## 6. Dataset
 
 За оние кои не се запознаени Data set <b>претставува колекција од податоци</b>, најчесто организирани во табела.
@@ -228,18 +230,69 @@ $$
 - d_model - димензијата на внесот
 
 
-
-
 Позиционалните вградувања се користат за информирање на трансфомерот на која позиција се наоѓаат векторите за внес. Тие се додаваат на секоја вредност во векторот посебно,
 
 ![granularnost](/assets/images/visualize.png)
+
+{% highlight python %}
+class PositionalEncoding(nn.Module):
+    def __init__(self, emb_size: int, dropout, maxlen: int = 10000):
+        super(PositionalEncoding, self).__init__()
+        den = torch.exp(- torch.arange(0, emb_size, 2) * math.log(10000) / emb_size)
+        pos = torch.arange(0, maxlen).reshape(maxlen, 1)
+        pos_embedding = torch.zeros((maxlen, emb_size))
+        pos_embedding[:, 0::2] = torch.sin(pos * den)
+        pos_embedding[:, 1::2] = torch.cos(pos * den)
+        pos_embedding = pos_embedding.unsqueeze(1)
+        self.dropout = nn.Dropout(dropout)
+        self.register_buffer('pos_embedding', pos_embedding)
+
+    def forward(self, token_embedding: Tensor):
+        return self.dropout(token_embedding +
+                            self.pos_embedding[:token_embedding.size(0),:])
+{% endhighlight %}
 
 
 
 
 ## 9. Внимание
+{% highlight python %}
+class Seq2SeqTransformer(nn.Module):
+    def __init__(self, num_encoder_layers: int, num_decoder_layers: int,
+                 emb_size: int, src_vocab_size: int, tgt_vocab_size: int,
+                 dim_feedforward:int = 512, dropout:float = 0.1):
+        super(Seq2SeqTransformer, self).__init__()
+        encoder_layer = TransformerEncoderLayer(d_model=emb_size, nhead=NHEAD,
+                                                dim_feedforward=dim_feedforward)
+        self.transformer_encoder = TransformerEncoder(encoder_layer, num_layers=num_encoder_layers)
+        decoder_layer = TransformerDecoderLayer(d_model=emb_size, nhead=NHEAD,
+                                                dim_feedforward=dim_feedforward)
+        self.transformer_decoder = TransformerDecoder(decoder_layer, num_layers=num_decoder_layers)
 
+        self.generator = nn.Linear(emb_size, tgt_vocab_size)
+        self.src_tok_emb = TokenEmbedding(src_vocab_size, emb_size)
+        self.tgt_tok_emb = TokenEmbedding(tgt_vocab_size, emb_size)
+        self.positional_encoding = PositionalEncoding(emb_size, dropout=dropout)
 
+    def forward(self, src: Tensor, trg: Tensor, src_mask: Tensor,
+                tgt_mask: Tensor, src_padding_mask: Tensor,
+                tgt_padding_mask: Tensor, memory_key_padding_mask: Tensor):
+        src_emb = self.positional_encoding(self.src_tok_emb(src))
+        tgt_emb = self.positional_encoding(self.tgt_tok_emb(trg))
+        memory = self.transformer_encoder(src_emb, src_mask, src_padding_mask)
+        outs = self.transformer_decoder(tgt_emb, memory, tgt_mask, None,
+                                        tgt_padding_mask, memory_key_padding_mask)
+        return self.generator(outs)
+
+    def encode(self, src: Tensor, src_mask: Tensor):
+        return self.transformer_encoder(self.positional_encoding(
+                            self.src_tok_emb(src)), src_mask)
+
+    def decode(self, tgt: Tensor, memory: Tensor, tgt_mask: Tensor):
+        return self.transformer_decoder(self.positional_encoding(
+                          self.tgt_tok_emb(tgt)), memory,
+                          tgt_mask)
+{% endhighlight %}
 
 Концептот на <b>"Внимание"</b> е да го реши проблемот со преведување на текст, пред 20тина години овој проблем бил решаван со комплексни алгоритми кои имале бројни проблеми, наједноставниот проблем била самата <b>должина на речениците при превод</b>, тие се менуваат и стануваат уште по очигледни кога користиме јазици кои имаат различен начин на пишување, за повеќе околу проблемите од класичните начини на превод без корисење на неуронски мрежи можи да прочитате [тука](https://en.wikipedia.org/wiki/Statistical_machine_translation#Shortcomings).
 
@@ -252,6 +305,112 @@ $$
 
 
 {% endraw %}
+
+
+
+
+## SentencePiece:
+
+### Unigram:
+
+е алгоритам за токенизација на под-зборови, каде што претпоставката е дека појавата на токен е <b>независна</b> од било кој од другите токени кои се појавиле претходно.
+
+
+<br>
+
+---
+
+<br>
+
+## Тренирање:
+
+Под процесот тренирање се мисли учење на невронската мрежа (трансформерот) да преведува текст.
+
+За овој чекор искористивме [Nvidia графичка RTX 4090](https://www.nvidia.com/en-us/geforce/graphics-cards/40-series/rtx-4090/) со 24 GB VRAM.
+
+Моделот го трениравме 20 епохи, секоја епоха траеше околу еден час, после 20 епохи учење, моделот започна да покажува знаци на конвергенција (асимптотски паралелно со x оската).
+
+![tokenizator](/assets/images/valtrainlossepoch.png)
+
+За Validation Loss беше користено 10% од податоците, со фиксиран seed за репордукција (42). Причината за толку мал примерок е тоа што dataset-от е веќе мал, а 30% се премногу податоци да бидат надвор за валидација а не тренирање. Можеби и затоа се толку лоши резултатите.
+
+Според табелата која е прикажана како <b>најдобар кандидат за инференца</b> се покажа епоха 18, со најниска вредност на валидација, тажно е што вредностите се над 3.
+
+Претпоставуваме дека направивме грешка со learning-rate или грешка што искуството може само да ни ја открие, доколку некој поискусен знае слободно нека не корегира.
+
+| Epoch | Train Loss | Validation Loss |
+|-------|------------|-----------------|
+| 1     | 4.593      | 4.0319          |
+| 2     | 4.526      | 3.9444          |
+| 3     | 4.056      | 3.6089          |
+| 4     | 3.852      | 3.4798          |
+| 5     | 3.792      | 3.4891          |
+| 6     | 3.759      | 3.3927          |
+| 7     | 3.729      | 3.3943          |
+| 8     | 3.747      | 3.3443          |
+| 9     | 3.715      | 3.3782          |
+| 10    | 3.718      | 3.3259          |
+| 11    | 3.678      | 3.2844          |
+| 12    | 3.634      | 3.2948          |
+| 13    | 3.603      | 3.2525          |
+| 14    | 3.586      | 3.2174          |
+| 15    | 3.559      | 3.1606          |
+| 16    | 3.535      | 3.2004          |
+| 17    | 3.527      | 3.1526          |
+| 18    | 3.505      | 3.1024          |
+| 19    | 3.529      | 3.1507          |
+| 20    | 3.546      | 3.1696          |
+| 21    | 3.536      | 3.1309          |
+| 22    | 3.521      | 3.1388          |
+| 23    | 3.538      | 3.1521          |
+
+
+<br>
+
+---
+
+<br>
+
+
+## Архитектура на моделот
+
+| Параметри                        |             |
+|----------------------------------|-------------|
+| Македонски вокабулар             | 11,370      |
+| Англиски вокабулар               | 8,257       |
+| Големина на embedding            | 512         |
+| Број на глави за внимание        | 8           |
+| FFN скриен слој (FFN_HID_DIM)    | 512         |
+| Големина на batch (BATCH_SIZE)   | 4           |
+| Број на енкодер слоеви           | 3           |
+| Број на декодер слоеви           | 3           |
+
+
+
+<br>
+
+---
+
+<br>
+
+## Резултати
+
+Моделот е дефинитивно премал за реални апликации, со помали реченици добро се снаоѓа.
+
+
+### Лимитации
+
+1. Големината на Data-setот, 500 илјади пар реченици можеби звучат многу, но во пракса јазиците се покажуваат покомплексни од она што изгледаат на површина,дел од проблемот кои го воочивме е дека дури и моделите како GPT, Claude, LLAMA,<b> кои имаат десетици милијарди параметри</b> имаат проблеми и потешкотии со македонскиот јазик, не дека нашиот јазик не е богат, туку причината се недостаток на податоци, за вакви проекти се потребни квалитетни паралелни преводи.
+
+Дефинитивно би направиле огромен отскок, доколку моделот беше трениран да речиме од 1 до 10 милиони квалитетни реченици.
+
+2. Како втора лимитација е пристапот до тренирање на хардвер, за овој проект потрошивме околу 20 евра на тренирање на моделот (за пристап до RTX 4090).
+
+3. Тука би се ставиле ние авторите како лимитација, како почетници во оваја сфера, скоро 2 месеци лутавме по документации за да ги научиме основите, претпоставуваме дека имаме грешки при разбирање, имплементација, како и тренирање и валидација на моделот.
+
+### Demo
+
+[![Run on Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/najdovski-stefan/Donka-v1/blob/main/Donka_v1_Inference_seq2seq_mk_en-GOOGLE-COLAB.ipynb)
 
 
 
@@ -268,66 +427,8 @@ $$
     Моделот <b>МОЖЕ</b> да се користи за едукативни цели и истражувачки цели.
     <br>
     <br>
-    Моделот <b>НЕ</b> може да биде користен во комерцијални продукти или цели на кој било начин.
+    Моделот <b>НЕ</b> може да биде користен во комерцијални продукти.
 </div>
-
-
-## SentencePiece:
-
-### Unigram:
-
-е алгоритам за токенизација на под-зборови, каде што претпоставката е дека појавата на токен е <b>независна</b> од било кој од другите токени кои се појавиле претходно.
-
-
----
-
-<br>
-
-## Тренирање:
-
-Под процесот тренирање се мисли учење на невронската мрежа (трансформерот) да преведува текст.
-
-За овој чекор искористивме [Nvidia графичка RTX 4090](https://www.nvidia.com/en-us/geforce/graphics-cards/40-series/rtx-4090/) со 24 GB VRAM.
-
-Моделот го трениравме 20 епохи, секоја епоха траеше околу еден час, после 20 епохи учење, моделот започна да стагнира.
-
-![tokenizator](/assets/images/valtrainlossepoch.png)
-
-Спред Validation Loss (90% за тренирање, 10% за валидација од Data Set), епоха 18 покажа најдобри резултати.
-
-После епоха 18 има почување на Loss, што покажува знаци на почеток на overfiting?
-
-
-
-Кодот за тренирање на моделот може да го најдите тука:
-
-{% highlight python %}
-print('is the syntax working?')
-{% endhighlight %}
-
-
-<br>
-
----
-
-<br>
-
-## Резултати
-
-
-
-<br>
-
----
-
-<br>
-
-
-## Demo
-
-
-
-
 
 <br>
 

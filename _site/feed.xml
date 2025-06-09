@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-06-09T10:44:10+02:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Денес Нешто Научив</title><subtitle></subtitle><entry><title type="html">Имплементациjа На Трансформер Архитектурата За Македонско-Англиски Превод На Реченици</title><link href="http://localhost:4000/basics/2025/06/06/transformer-mk-en.html" rel="alternate" type="text/html" title="Имплементациjа На Трансформер Архитектурата За Македонско-Англиски Превод На Реченици" /><published>2025-06-06T09:32:32+02:00</published><updated>2025-06-06T09:32:32+02:00</updated><id>http://localhost:4000/basics/2025/06/06/transformer-mk-en</id><content type="html" xml:base="http://localhost:4000/basics/2025/06/06/transformer-mk-en.html"><![CDATA[<p><br /></p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-06-09T14:05:41+02:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Денес Нешто Научив</title><subtitle></subtitle><entry><title type="html">Имплементациjа На Трансформер Архитектурата За Македонско-Англиски Превод На Реченици</title><link href="http://localhost:4000/basics/2025/06/06/transformer-mk-en.html" rel="alternate" type="text/html" title="Имплементациjа На Трансформер Архитектурата За Македонско-Англиски Превод На Реченици" /><published>2025-06-06T09:32:32+02:00</published><updated>2025-06-06T09:32:32+02:00</updated><id>http://localhost:4000/basics/2025/06/06/transformer-mk-en</id><content type="html" xml:base="http://localhost:4000/basics/2025/06/06/transformer-mk-en.html"><![CDATA[<p><br /></p>
 
 <hr />
 
@@ -219,13 +219,302 @@
 
 <p><img src="/assets/images/visualize.png" alt="granularnost" /></p>
 
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">PositionalEncoding</span><span class="p">(</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">emb_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dropout</span><span class="p">,</span> <span class="n">maxlen</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PositionalEncoding</span><span class="p">,</span> <span class="bp">self</span><span class="p">).</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="n">den</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span> <span class="n">torch</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">emb_size</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span> <span class="o">/</span> <span class="n">emb_size</span><span class="p">)</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxlen</span><span class="p">).</span><span class="n">reshape</span><span class="p">(</span><span class="n">maxlen</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">pos_embedding</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">maxlen</span><span class="p">,</span> <span class="n">emb_size</span><span class="p">))</span>
+        <span class="n">pos_embedding</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">sin</span><span class="p">(</span><span class="n">pos</span> <span class="o">*</span> <span class="n">den</span><span class="p">)</span>
+        <span class="n">pos_embedding</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">cos</span><span class="p">(</span><span class="n">pos</span> <span class="o">*</span> <span class="n">den</span><span class="p">)</span>
+        <span class="n">pos_embedding</span> <span class="o">=</span> <span class="n">pos_embedding</span><span class="p">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s">'pos_embedding'</span><span class="p">,</span> <span class="n">pos_embedding</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token_embedding</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">token_embedding</span> <span class="o">+</span>
+                            <span class="bp">self</span><span class="p">.</span><span class="n">pos_embedding</span><span class="p">[:</span><span class="n">token_embedding</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),:])</span></code></pre></figure>
+
 <h2 id="9-внимание">9. Внимание</h2>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Seq2SeqTransformer</span><span class="p">(</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_encoder_layers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_decoder_layers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">emb_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">src_vocab_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">tgt_vocab_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">dim_feedforward</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">,</span> <span class="n">dropout</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Seq2SeqTransformer</span><span class="p">,</span> <span class="bp">self</span><span class="p">).</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="n">encoder_layer</span> <span class="o">=</span> <span class="n">TransformerEncoderLayer</span><span class="p">(</span><span class="n">d_model</span><span class="o">=</span><span class="n">emb_size</span><span class="p">,</span> <span class="n">nhead</span><span class="o">=</span><span class="n">NHEAD</span><span class="p">,</span>
+                                                <span class="n">dim_feedforward</span><span class="o">=</span><span class="n">dim_feedforward</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">transformer_encoder</span> <span class="o">=</span> <span class="n">TransformerEncoder</span><span class="p">(</span><span class="n">encoder_layer</span><span class="p">,</span> <span class="n">num_layers</span><span class="o">=</span><span class="n">num_encoder_layers</span><span class="p">)</span>
+        <span class="n">decoder_layer</span> <span class="o">=</span> <span class="n">TransformerDecoderLayer</span><span class="p">(</span><span class="n">d_model</span><span class="o">=</span><span class="n">emb_size</span><span class="p">,</span> <span class="n">nhead</span><span class="o">=</span><span class="n">NHEAD</span><span class="p">,</span>
+                                                <span class="n">dim_feedforward</span><span class="o">=</span><span class="n">dim_feedforward</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">transformer_decoder</span> <span class="o">=</span> <span class="n">TransformerDecoder</span><span class="p">(</span><span class="n">decoder_layer</span><span class="p">,</span> <span class="n">num_layers</span><span class="o">=</span><span class="n">num_decoder_layers</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="p">.</span><span class="n">generator</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">emb_size</span><span class="p">,</span> <span class="n">tgt_vocab_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">src_tok_emb</span> <span class="o">=</span> <span class="n">TokenEmbedding</span><span class="p">(</span><span class="n">src_vocab_size</span><span class="p">,</span> <span class="n">emb_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">tgt_tok_emb</span> <span class="o">=</span> <span class="n">TokenEmbedding</span><span class="p">(</span><span class="n">tgt_vocab_size</span><span class="p">,</span> <span class="n">emb_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">positional_encoding</span> <span class="o">=</span> <span class="n">PositionalEncoding</span><span class="p">(</span><span class="n">emb_size</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="n">dropout</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">trg</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">src_mask</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+                <span class="n">tgt_mask</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">src_padding_mask</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+                <span class="n">tgt_padding_mask</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">memory_key_padding_mask</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
+        <span class="n">src_emb</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">positional_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">src_tok_emb</span><span class="p">(</span><span class="n">src</span><span class="p">))</span>
+        <span class="n">tgt_emb</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">positional_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">tgt_tok_emb</span><span class="p">(</span><span class="n">trg</span><span class="p">))</span>
+        <span class="n">memory</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">transformer_encoder</span><span class="p">(</span><span class="n">src_emb</span><span class="p">,</span> <span class="n">src_mask</span><span class="p">,</span> <span class="n">src_padding_mask</span><span class="p">)</span>
+        <span class="n">outs</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">transformer_decoder</span><span class="p">(</span><span class="n">tgt_emb</span><span class="p">,</span> <span class="n">memory</span><span class="p">,</span> <span class="n">tgt_mask</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span>
+                                        <span class="n">tgt_padding_mask</span><span class="p">,</span> <span class="n">memory_key_padding_mask</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">generator</span><span class="p">(</span><span class="n">outs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">src_mask</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">transformer_encoder</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">positional_encoding</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="p">.</span><span class="n">src_tok_emb</span><span class="p">(</span><span class="n">src</span><span class="p">)),</span> <span class="n">src_mask</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tgt</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">memory</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">tgt_mask</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">transformer_decoder</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">positional_encoding</span><span class="p">(</span>
+                          <span class="bp">self</span><span class="p">.</span><span class="n">tgt_tok_emb</span><span class="p">(</span><span class="n">tgt</span><span class="p">)),</span> <span class="n">memory</span><span class="p">,</span>
+                          <span class="n">tgt_mask</span><span class="p">)</span></code></pre></figure>
 
 <p>Концептот на <b>“Внимание”</b> е да го реши проблемот со преведување на текст, пред 20тина години овој проблем бил решаван со комплексни алгоритми кои имале бројни проблеми, наједноставниот проблем била самата <b>должина на речениците при превод</b>, тие се менуваат и стануваат уште по очигледни кога користиме јазици кои имаат различен начин на пишување, за повеќе околу проблемите од класичните начини на превод без корисење на неуронски мрежи можи да прочитате <a href="https://en.wikipedia.org/wiki/Statistical_machine_translation#Shortcomings">тука</a>.</p>
 
 <h3 id="клучеви-вредности">Клучеви, Вредности</h3>
 
 \[Vnimanie(Q, K, V) = \text{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V\]
+
+<h2 id="sentencepiece">SentencePiece:</h2>
+
+<h3 id="unigram">Unigram:</h3>
+
+<p>е алгоритам за токенизација на под-зборови, каде што претпоставката е дека појавата на токен е <b>независна</b> од било кој од другите токени кои се појавиле претходно.</p>
+
+<p><br /></p>
+
+<hr />
+
+<p><br /></p>
+
+<h2 id="тренирање">Тренирање:</h2>
+
+<p>Под процесот тренирање се мисли учење на невронската мрежа (трансформерот) да преведува текст.</p>
+
+<p>За овој чекор искористивме <a href="https://www.nvidia.com/en-us/geforce/graphics-cards/40-series/rtx-4090/">Nvidia графичка RTX 4090</a> со 24 GB VRAM.</p>
+
+<p>Моделот го трениравме 20 епохи, секоја епоха траеше околу еден час, после 20 епохи учење, моделот започна да покажува знаци на конвергенција (асимптотски паралелно со x оската).</p>
+
+<p><img src="/assets/images/valtrainlossepoch.png" alt="tokenizator" /></p>
+
+<p>За Validation Loss беше користено 10% од податоците, со фиксиран seed за репордукција (42). Причината за толку мал примерок е тоа што dataset-от е веќе мал, а 30% се премногу податоци да бидат надвор за валидација а не тренирање. Можеби и затоа се толку лоши резултатите.</p>
+
+<p>Според табелата која е прикажана како <b>најдобар кандидат за инференца</b> се покажа епоха 18, со најниска вредност на валидација, тажно е што вредностите се над 3.</p>
+
+<p>Претпоставуваме дека направивме грешка со learning-rate или грешка што искуството може само да ни ја открие, доколку некој поискусен знае слободно нека не корегира.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Epoch</th>
+      <th>Train Loss</th>
+      <th>Validation Loss</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>4.593</td>
+      <td>4.0319</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>4.526</td>
+      <td>3.9444</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>4.056</td>
+      <td>3.6089</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>3.852</td>
+      <td>3.4798</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>3.792</td>
+      <td>3.4891</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>3.759</td>
+      <td>3.3927</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>3.729</td>
+      <td>3.3943</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>3.747</td>
+      <td>3.3443</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>3.715</td>
+      <td>3.3782</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>3.718</td>
+      <td>3.3259</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>3.678</td>
+      <td>3.2844</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>3.634</td>
+      <td>3.2948</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>3.603</td>
+      <td>3.2525</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td>3.586</td>
+      <td>3.2174</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td>3.559</td>
+      <td>3.1606</td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td>3.535</td>
+      <td>3.2004</td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td>3.527</td>
+      <td>3.1526</td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td>3.505</td>
+      <td>3.1024</td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td>3.529</td>
+      <td>3.1507</td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td>3.546</td>
+      <td>3.1696</td>
+    </tr>
+    <tr>
+      <td>21</td>
+      <td>3.536</td>
+      <td>3.1309</td>
+    </tr>
+    <tr>
+      <td>22</td>
+      <td>3.521</td>
+      <td>3.1388</td>
+    </tr>
+    <tr>
+      <td>23</td>
+      <td>3.538</td>
+      <td>3.1521</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br /></p>
+
+<hr />
+
+<p><br /></p>
+
+<h2 id="архитектура-на-моделот">Архитектура на моделот</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Параметри</th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Македонски вокабулар</td>
+      <td>11,370</td>
+    </tr>
+    <tr>
+      <td>Англиски вокабулар</td>
+      <td>8,257</td>
+    </tr>
+    <tr>
+      <td>Големина на embedding</td>
+      <td>512</td>
+    </tr>
+    <tr>
+      <td>Број на глави за внимание</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <td>FFN скриен слој (FFN_HID_DIM)</td>
+      <td>512</td>
+    </tr>
+    <tr>
+      <td>Големина на batch (BATCH_SIZE)</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>Број на енкодер слоеви</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>Број на декодер слоеви</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br /></p>
+
+<hr />
+
+<p><br /></p>
+
+<h2 id="резултати">Резултати</h2>
+
+<p>Моделот е дефинитивно премал за реални апликации, со помали реченици добро се снаоѓа.</p>
+
+<h3 id="лимитации">Лимитации</h3>
+
+<ol>
+  <li>Големината на Data-setот, 500 илјади пар реченици можеби звучат многу, но во пракса јазиците се покажуваат покомплексни од она што изгледаат на површина,дел од проблемот кои го воочивме е дека дури и моделите како GPT, Claude, LLAMA,<b> кои имаат десетици милијарди параметри</b> имаат проблеми и потешкотии со македонскиот јазик, не дека нашиот јазик не е богат, туку причината се недостаток на податоци, за вакви проекти се потребни квалитетни паралелни преводи.</li>
+</ol>
+
+<p>Дефинитивно би направиле огромен отскок, доколку моделот беше трениран да речиме од 1 до 10 милиони квалитетни реченици.</p>
+
+<ol>
+  <li>
+    <p>Како втора лимитација е пристапот до тренирање на хардвер, за овој проект потрошивме околу 20 евра на тренирање на моделот (за пристап до RTX 4090).</p>
+  </li>
+  <li>
+    <p>Тука би се ставиле ние авторите како лимитација, како почетници во оваја сфера, скоро 2 месеци лутавме по документации за да ги научиме основите, претпоставуваме дека имаме грешки при разбирање, имплементација, како и тренирање и валидација на моделот.</p>
+  </li>
+</ol>
+
+<h3 id="demo">Demo</h3>
+
+<p><a href="https://colab.research.google.com/github/najdovski-stefan/Donka-v1/blob/main/Donka_v1_Inference_seq2seq_mk_en-GOOGLE-COLAB.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Run on Colab" /></a></p>
 
 <div style="background-color: #ff0000; color: #ffffff; border: 1px solid #ffeeba; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
     <strong>⚠️  Предупредување:</strong>
@@ -240,52 +529,8 @@
     Моделот <b>МОЖЕ</b> да се користи за едукативни цели и истражувачки цели.
     <br />
     <br />
-    Моделот <b>НЕ</b> може да биде користен во комерцијални продукти или цели на кој било начин.
+    Моделот <b>НЕ</b> може да биде користен во комерцијални продукти.
 </div>
-
-<h2 id="sentencepiece">SentencePiece:</h2>
-
-<h3 id="unigram">Unigram:</h3>
-
-<p>е алгоритам за токенизација на под-зборови, каде што претпоставката е дека појавата на токен е <b>независна</b> од било кој од другите токени кои се појавиле претходно.</p>
-
-<hr />
-
-<p><br /></p>
-
-<h2 id="тренирање">Тренирање:</h2>
-
-<p>Под процесот тренирање се мисли учење на невронската мрежа (трансформерот) да преведува текст.</p>
-
-<p>За овој чекор искористивме <a href="https://www.nvidia.com/en-us/geforce/graphics-cards/40-series/rtx-4090/">Nvidia графичка RTX 4090</a> со 24 GB VRAM.</p>
-
-<p>Моделот го трениравме 20 епохи, секоја епоха траеше околу еден час, после 20 епохи учење, моделот започна да стагнира.</p>
-
-<p><img src="/assets/images/valtrainlossepoch.png" alt="tokenizator" /></p>
-
-<p>Спред Validation Loss (90% за тренирање, 10% за валидација од Data Set), епоха 18 покажа најдобри резултати.</p>
-
-<p>После епоха 18 има почување на Loss, што покажува знаци на почеток на overfiting?</p>
-
-<p>Кодот за тренирање на моделот може да го најдите тука:</p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">print</span><span class="p">(</span><span class="s">'is the syntax working?'</span><span class="p">)</span></code></pre></figure>
-
-<p><br /></p>
-
-<hr />
-
-<p><br /></p>
-
-<h2 id="резултати">Резултати</h2>
-
-<p><br /></p>
-
-<hr />
-
-<p><br /></p>
-
-<h2 id="demo">Demo</h2>
 
 <p><br /></p>
 

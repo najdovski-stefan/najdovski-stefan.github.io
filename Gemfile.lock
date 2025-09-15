@@ -51,6 +51,7 @@ GEM
     ffi (1.17.2-arm-linux-gnu)
     ffi (1.17.2-arm-linux-musl)
     ffi (1.17.2-arm64-darwin)
+    ffi (1.17.2-x64-mingw-ucrt)
     ffi (1.17.2-x86_64-darwin)
     ffi (1.17.2-x86_64-linux-gnu)
     ffi (1.17.2-x86_64-linux-musl)
@@ -145,6 +146,7 @@ GEM
       jekyll (>= 3.0, < 5.0)
     jekyll-feed (0.17.0)
       jekyll (>= 3.7, < 5.0)
+    jekyll-figure (0.2.0)
     jekyll-gist (1.5.0)
       octokit (~> 4.2)
     jekyll-github-metadata (2.16.1)
@@ -252,6 +254,8 @@ GEM
       racc (~> 1.4)
     nokogiri (1.18.8-arm64-darwin)
       racc (~> 1.4)
+    nokogiri (1.18.8-x64-mingw-ucrt)
+      racc (~> 1.4)
     nokogiri (1.18.8-x86_64-darwin)
       racc (~> 1.4)
     nokogiri (1.18.8-x86_64-linux-gnu)
@@ -298,12 +302,14 @@ PLATFORMS
   arm-linux-gnu
   arm-linux-musl
   arm64-darwin
+  x64-mingw-ucrt
   x86_64-darwin
   x86_64-linux-gnu
   x86_64-linux-musl
 
 DEPENDENCIES
   github-pages
+  jekyll-figure
   minima (~> 2.5)
 
 BUNDLED WITH

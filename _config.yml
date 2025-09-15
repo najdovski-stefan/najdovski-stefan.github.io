@@ -7,6 +7,9 @@ url: "https://najdovski-stefan.github.io/" # the base hostname & protocol for yo
 theme: minima
 plugins:
   - jekyll-feed
+  - jekyll-figure
+include:
+  - assets/custom.css
 # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to

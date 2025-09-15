@@ -1,0 +1,627 @@
+<p><br /></p>
+
+<hr />
+
+<p><br /></p>
+
+<p><a href="https://colab.research.google.com/github/najdovski-stefan/Donka-v1/blob/main/Donka_v1_Inference_seq2seq_mk_en-GOOGLE-COLAB.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Run on Colab" /></a></p>
+
+<p><br /></p>
+
+<hr />
+
+<p><br /></p>
+
+<div style="background-color: #ff0000; color: #ffffff; border: 1px solid #ffeeba; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+    <strong>⚠️  Блогот е во процес на пишување и валидација:</strong>
+    <br />
+    <br />
+
+
+    Хаотична Драфт верзија
+
+  <br />
+  <br />
+
+
+    Ве молиме вратете се подоцна
+
+
+  <br />
+  <br />
+
+    Ви благодариме
+
+</div>
+
+<hr />
+
+<p>Блогов што го читате е резултат на <strong>работните групи по вештачка интелигенција</strong>, каде што ние студентите <strong>Стефан Најдовски</strong> и <strong>Христијан Горков</strong>, запишани на прв циклус студии на <a href="https://fikt.uklo.edu.mk/">Факултетот за Информатички и Комункациски Технологии - Битола</a> под менторство на <a href="https://fikt.uklo.edu.mk/prof-d-r-kostandina-veljanovski/">Проф д-р Костандина Вељановска</a>.
+и асистентот <a href="(https://fikt.uklo.edu.mk/darko-pajkovski/)">М-р Дарко Пајковски</a>.</p>
+
+<p>Нашата тема на обработка ќе ви ја претставиме детално, низ илустрации а резулатот од нашето мини истражување е <strong>мал модел кој може да преведува македонски текст</strong>.</p>
+
+<p><br /></p>
+
+<hr />
+
+<p><br /></p>
+
+<h1 id="содржина">Содржина</h1>
+
+<ol>
+  <li><a href="#1-вовед">Вовед</a></li>
+  <li><a href="#2-токен">Што е токен?</a> (Token)</li>
+  <li><a href="#3-речник">Речник</a> (Data Set)</li>
+  <li><a href="#4-токенизирање">Токенизирање</a> (Tokenization)</li>
+  <li><a href="#5-sentencepiece библиотека">SentencePiece библиотека</a></li>
+  <li>Token Eembeddings</li>
+  <li>Секвенца во Секвенца</li>
+  <li>Лимитации</li>
+</ol>
+
+<hr />
+
+<p><br /></p>
+
+<h2 id="1-вовед">1. Вовед</h2>
+
+<p>Целта на овој блог е со <strong>двојна природа</strong>, <strong>првенствено е наменета да научиме како функционира Transformer архитектурата</strong>, делот кој ја направи науката за вештачки неуронски мрежи <strong>посериозна, практична и достапна за секого</strong>, најголема примена има во <a href="https://www.ibm.com/think/topics/large-language-models">Large Language Models</a> како <a href="https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf">GPT</a>, Claude, Mistral, LLAMA…</p>
+
+<p><strong>Втората цел ни е да ви претставиме мал модел</strong> кој знае да преведува кратки реченици од македонски јазик на англиски јазик.</p>
+
+<p>На крајот има и <strong>demo</strong> од проектот, што може да се користи практично, со одредени лимитации.</p>
+
+<p>Секако нашата имплементација тука ќе биде <strong>многу пати поедноставна</strong>, но есенцијално идејата е иста, скоро целосно базирана врз оригиналниот труд <a href="https://arxiv.org/pdf/1706.03762">Attention is All You Need</a>.</p>
+
+<p>Целта <strong>нема</strong> да биди:  Generative Pretrained Transformer (GPT), имплементација на целосен Large Language Model (LLM), е далеку покомплицирано со теорија и уште потешко за имплеметнација, сакавме да бидиме јасни за која е целта.</p>
+
+<p>Она што ќе го имплементираме и објасниме, ќе биди:</p>
+
+<p><strong>Sequence to Sequence Vanilla Transformer</strong> или на кратко <strong>Seq2Seq Transformer</strong>.</p>
+
+<p>Ќе гледаме да балансираме со технички жаргони и да објасниме интуитивно и со примери за секој да може да не следи.</p>
+
+<p>Ви препорачуваме да имате некоја блага основа за полесно следење, за тоа што е <strong>Neural Network</strong> и што е тоа <strong>Natural Language Processing</strong>, исто препорачливо е познавање на <strong>основи на веројатност и статистика</strong>.</p>
+
+<p>Доколку сакате да научите или сте љубопитни и жедни за знаење слободно погледнете:
+<a href="#корисна-литература-за-почетници-и-за-љубопитните">Корисни ресурси за почетници</a></p>
+
+<p><br /></p>
+
+<div style="background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+    <strong>⚠️ Мало Предупредување:</strong>
+
+    <br />
+    <br />
+
+        Овој блог е пишуван од студенти, сè уште ги проучуваме детално сите идеи презентирани на блогот
+
+  <br />
+  <br />
+
+  Сигурни сме дека имаме некаде грешка. Очекувајте грешки како граматички и нестандарден јазик.
+
+  <br />
+  <br />
+
+  **Отворени сме на конструктивни критики**
+
+  <br />
+  <br />
+  Доколку пронајдите какви било грешки слободно контактирајте не.
+
+  <br />
+  <br />
+  Благодариме :)
+</div>
+
+<p><br /></p>
+
+<hr />
+
+<p><br /></p>
+
+<h2 id="2-токен">2. Токен</h2>
+
+<p>Овој збор кај нас би бил преведен како <strong>лексема</strong> или <strong>жетон</strong>, во англиската (програмерската) литература e дефиниран како <strong>атомична (неделива) единица за репрезентација нa текст.</strong> (искрено не сме сигурни дали го имаат истото значење на македонски или општо во лингвистиката).</p>
+
+<p>Должината на оваа единица е <strong>произволна</strong> и зависи од проблемот што сакаме да го решиме.</p>
+
+<p>Се сретнува во повеќе должини:</p>
+<ul>
+  <li><strong>Реченица</strong> (пример: Здраво Македонијо!)</li>
+  <li><strong>Дел од збор</strong> (пример во вистински јазик би биле слоговите).</li>
+  <li><strong>Збор</strong>(пример: <strong>здраво</strong>).</li>
+  <li><strong>Карактер</strong> (пример: <strong>а</strong>).</li>
+  <li><strong>Бајт</strong> (пример: <strong>ASCII</strong> или <strong>UTF</strong> енкодиран карактер).</li>
+</ul>
+
+<p><img src="/assets/images/granularnost.png" alt="granularnost" /></p>
+
+<p><br /></p>
+
+<hr />
+
+<p><br /></p>
+
+<h2 id="3речник">3.Речник</h2>
+<p>За да се направи еден модел за обработка на природен јазик, потребно е да се собере речник на зборови кои ќе се користат при тренирање. Што поголем речник, подобри резултати.<br />
+Нашиот модел имаше речник од <strong>500.000</strong> реченици, секоја од нив преведена на англиски. Иако тоа звучи како голема бројка, сепак не е доволно за целосно да се намали грешката на резултатот, тоа претставува и еден од недостатоците на овој модел. Имено, речникот се состои од</p>
+<h2 id="4-токенизирање">4. Токенизирање</h2>
+
+<p>Е процесот на претворање на текст (во нашиот случај македонска кирилица) во токени, со тоа што подоцна истите тие ќе бидат претставени како <strong>вектори</strong> за моделот да може да ги процесира.</p>
+
+<p>Типови на токенајзери:</p>
+
+<ul>
+  <li>
+    <p>со правила (Rule-based) (токен-збор,токен-буква), најнеоптимален.</p>
+  </li>
+  <li>
+    <p>Научен (Learned) тип:</p>
+  </li>
+  <li>
+    <p>Во Научените токенизатори спаѓаат: Byte-Pair Encoding (BPE), WordPiece и Униграм.</p>
+  </li>
+</ul>
+
+<p><img src="/assets/images/tokenizator.png" alt="tokenizator" /></p>
+
+<ul>
+  <li>ние го користиме <strong>Unigram</strong>, со помош на <strong>sentencepiece</strong> библиотеката.</li>
+</ul>
+
+<h2 id="6-dataset">6. Dataset</h2>
+
+<p>За оние кои не се запознаени Data set <strong>претставува колекција од податоци</strong>, најчесто организирани во табела.</p>
+
+<p>Изглед на нашата “табела”:</p>
+
+<pre><code class="language-tsv">здраво  hello
+ние сме студенти.  we are students.
+јас сакам да учам.  I want to learn.
+...
+</code></pre>
+
+<p>За тренирање на нашиот модел ние искористивме корпус кој е достапен на интернет, секако со дозвола на авторите кои можите да ги најдите <a href="#благодарност-до">тука</a>.</p>
+
+<p>Податоците за тренирање ги зачувавме во формат наречен <a href="https://www.loc.gov/preservation/digital/formats/fdd/fdd000533.shtml">Tab-Separated Value</a> или <strong>TSV</strong> на кратко, со помош на библиотеката pandas во Python.</p>
+
+<p>Во <strong>првата колона ги ставивме речениците на македонски јазик</strong>, во <strong>втората колона ги ставивме преведените реченици на англиски јазик</strong>, дел од речениците беа преведени од почеток, остатокот од другите користевме Google Translate и локални LLM модели со техника на дестилација да враќа формат кој е прифатлив.</p>
+
+<p>Валидација правевме со неколку примероци за квалитетот. Но дефинитивно сметаме дека не е најдобар начин за превод.</p>
+
+<p>Како резултат добивме релативно мал data set од <strong>480 илјади преведени реченици</strong>.</p>
+
+<p>Дистрибуција според должина на реченици:</p>
+
+<p>Со помош на овие македонско-англиски парови го <a href="2025-06-06-transformer-mk-en#Тренирање:">трениравме моделот</a>.</p>
+
+<h2 id="7-севенца-во-секвенца-sequence-to-sequence">7. Севенца во Секвенца (Sequence to Sequence).</h2>
+
+<p><a href="">Seq2Seq</a> се користи за обработка на природни јазици <a href="https://mk.wikipedia.org/wiki/%D0%9E%D0%B1%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0_%D0%BD%D0%B0_%D0%BF%D1%80%D0%B8%D1%80%D0%BE%D0%B4%D0%BD%D0%B8_%D1%98%D0%B0%D0%B7%D0%B8%D1%86%D0%B8">NLP</a>.</p>
+
+<p>Во нашиот случај ќе го користиме за <strong>превод од македонски на англиски</strong>, мислиме дека е добар баланс помеѓу нешто што е ** корисно да направиме за нашиот мајчин јазик** ,нешто што ** не е само теорија** и нешто што <strong>може да се научи</strong>, три во едно :)</p>
+
+<p>Пред да се појави трансформер архитектурата, <strong>механизмите за “внимание”</strong> биле ограничени со <a href="">GRU</a> или <a href="">LSTM</a> и користењето на <a href="">RNN-Recurrent Neural Networks</a>.</p>
+
+<h2 id="8-positional-embeddings">8. Positional embeddings</h2>
+
+<p>Оргиналната имплементација користи статични (фиксни) позициони вградувања.</p>
+
+<p>За да се пресмета вредноста на едео позиционо вградување (3.5 во оригиналното истражувње).</p>
+
+<p>Авторите ги користат функциите <strong>синус и косинус</strong> (наставниците и професорите беа во право, корисни се) :</p>
+
+\[PE(\text{pos}, 2i) = \sin\left(\frac{\text{pos}}{10000^{\frac{2i}{d_{\text{model}}}}}\right)\]
+
+\[PE(\text{pos}, 2i+1) = \cos\left(\frac{\text{pos}}{10000^{\frac{2i}{d_{\text{model}}}}}\right)\]
+
+<p>Енкодирањето зависи од 3 вредности:</p>
+
+<ul>
+  <li>pos - позицијата на векторот</li>
+  <li>i - индексот внатре во векторот</li>
+  <li>d_model - димензијата на внесот</li>
+</ul>
+
+<p>Позиционалните вградувања се користат за информирање на трансфомерот на која позиција се наоѓаат векторите за внес. Тие се додаваат на секоја вредност во векторот посебно,</p>
+
+<p><img src="/assets/images/visualize.png" alt="granularnost" /></p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">PositionalEncoding</span><span class="p">(</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">emb_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dropout</span><span class="p">,</span> <span class="n">maxlen</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">):</span>
+        <span class="nf">super</span><span class="p">(</span><span class="n">PositionalEncoding</span><span class="p">,</span> <span class="n">self</span><span class="p">).</span><span class="nf">__init__</span><span class="p">()</span>
+        <span class="n">den</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">exp</span><span class="p">(</span><span class="o">-</span> <span class="n">torch</span><span class="p">.</span><span class="nf">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">emb_size</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span> <span class="o">/</span> <span class="n">emb_size</span><span class="p">)</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxlen</span><span class="p">).</span><span class="nf">reshape</span><span class="p">(</span><span class="n">maxlen</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">pos_embedding</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">zeros</span><span class="p">((</span><span class="n">maxlen</span><span class="p">,</span> <span class="n">emb_size</span><span class="p">))</span>
+        <span class="n">pos_embedding</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">sin</span><span class="p">(</span><span class="n">pos</span> <span class="o">*</span> <span class="n">den</span><span class="p">)</span>
+        <span class="n">pos_embedding</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">cos</span><span class="p">(</span><span class="n">pos</span> <span class="o">*</span> <span class="n">den</span><span class="p">)</span>
+        <span class="n">pos_embedding</span> <span class="o">=</span> <span class="n">pos_embedding</span><span class="p">.</span><span class="nf">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="nc">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
+        <span class="n">self</span><span class="p">.</span><span class="nf">register_buffer</span><span class="p">(</span><span class="sh">'</span><span class="s">pos_embedding</span><span class="sh">'</span><span class="p">,</span> <span class="n">pos_embedding</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">token_embedding</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">self</span><span class="p">.</span><span class="nf">dropout</span><span class="p">(</span><span class="n">token_embedding</span> <span class="o">+</span>
+                            <span class="n">self</span><span class="p">.</span><span class="n">pos_embedding</span><span class="p">[:</span><span class="n">token_embedding</span><span class="p">.</span><span class="nf">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),:])</span></code></pre></figure>
+
+<h2 id="9-внимание">9. Внимание</h2>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Seq2SeqTransformer</span><span class="p">(</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">num_encoder_layers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_decoder_layers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">emb_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">src_vocab_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">tgt_vocab_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">dim_feedforward</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">,</span> <span class="n">dropout</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">):</span>
+        <span class="nf">super</span><span class="p">(</span><span class="n">Seq2SeqTransformer</span><span class="p">,</span> <span class="n">self</span><span class="p">).</span><span class="nf">__init__</span><span class="p">()</span>
+        <span class="n">encoder_layer</span> <span class="o">=</span> <span class="nc">TransformerEncoderLayer</span><span class="p">(</span><span class="n">d_model</span><span class="o">=</span><span class="n">emb_size</span><span class="p">,</span> <span class="n">nhead</span><span class="o">=</span><span class="n">NHEAD</span><span class="p">,</span>
+                                                <span class="n">dim_feedforward</span><span class="o">=</span><span class="n">dim_feedforward</span><span class="p">)</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">transformer_encoder</span> <span class="o">=</span> <span class="nc">TransformerEncoder</span><span class="p">(</span><span class="n">encoder_layer</span><span class="p">,</span> <span class="n">num_layers</span><span class="o">=</span><span class="n">num_encoder_layers</span><span class="p">)</span>
+        <span class="n">decoder_layer</span> <span class="o">=</span> <span class="nc">TransformerDecoderLayer</span><span class="p">(</span><span class="n">d_model</span><span class="o">=</span><span class="n">emb_size</span><span class="p">,</span> <span class="n">nhead</span><span class="o">=</span><span class="n">NHEAD</span><span class="p">,</span>
+                                                <span class="n">dim_feedforward</span><span class="o">=</span><span class="n">dim_feedforward</span><span class="p">)</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">transformer_decoder</span> <span class="o">=</span> <span class="nc">TransformerDecoder</span><span class="p">(</span><span class="n">decoder_layer</span><span class="p">,</span> <span class="n">num_layers</span><span class="o">=</span><span class="n">num_decoder_layers</span><span class="p">)</span>
+
+        <span class="n">self</span><span class="p">.</span><span class="n">generator</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="nc">Linear</span><span class="p">(</span><span class="n">emb_size</span><span class="p">,</span> <span class="n">tgt_vocab_size</span><span class="p">)</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">src_tok_emb</span> <span class="o">=</span> <span class="nc">TokenEmbedding</span><span class="p">(</span><span class="n">src_vocab_size</span><span class="p">,</span> <span class="n">emb_size</span><span class="p">)</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">tgt_tok_emb</span> <span class="o">=</span> <span class="nc">TokenEmbedding</span><span class="p">(</span><span class="n">tgt_vocab_size</span><span class="p">,</span> <span class="n">emb_size</span><span class="p">)</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">positional_encoding</span> <span class="o">=</span> <span class="nc">PositionalEncoding</span><span class="p">(</span><span class="n">emb_size</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="n">dropout</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">src</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">trg</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">src_mask</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+                <span class="n">tgt_mask</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">src_padding_mask</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+                <span class="n">tgt_padding_mask</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">memory_key_padding_mask</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
+        <span class="n">src_emb</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">positional_encoding</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="nf">src_tok_emb</span><span class="p">(</span><span class="n">src</span><span class="p">))</span>
+        <span class="n">tgt_emb</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">positional_encoding</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="nf">tgt_tok_emb</span><span class="p">(</span><span class="n">trg</span><span class="p">))</span>
+        <span class="n">memory</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">transformer_encoder</span><span class="p">(</span><span class="n">src_emb</span><span class="p">,</span> <span class="n">src_mask</span><span class="p">,</span> <span class="n">src_padding_mask</span><span class="p">)</span>
+        <span class="n">outs</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">transformer_decoder</span><span class="p">(</span><span class="n">tgt_emb</span><span class="p">,</span> <span class="n">memory</span><span class="p">,</span> <span class="n">tgt_mask</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span>
+                                        <span class="n">tgt_padding_mask</span><span class="p">,</span> <span class="n">memory_key_padding_mask</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">self</span><span class="p">.</span><span class="nf">generator</span><span class="p">(</span><span class="n">outs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">src</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">src_mask</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">self</span><span class="p">.</span><span class="nf">transformer_encoder</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="nf">positional_encoding</span><span class="p">(</span>
+                            <span class="n">self</span><span class="p">.</span><span class="nf">src_tok_emb</span><span class="p">(</span><span class="n">src</span><span class="p">)),</span> <span class="n">src_mask</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">tgt</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">memory</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">tgt_mask</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">self</span><span class="p">.</span><span class="nf">transformer_decoder</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="nf">positional_encoding</span><span class="p">(</span>
+                          <span class="n">self</span><span class="p">.</span><span class="nf">tgt_tok_emb</span><span class="p">(</span><span class="n">tgt</span><span class="p">)),</span> <span class="n">memory</span><span class="p">,</span>
+                          <span class="n">tgt_mask</span><span class="p">)</span></code></pre></figure>
+
+<p>Концептот на <strong>“Внимание”</strong> е да го реши проблемот со преведување на текст, пред 20тина години овој проблем бил решаван со комплексни алгоритми кои имале бројни проблеми, наједноставниот проблем била самата <strong>должина на речениците при превод</strong>, тие се менуваат и стануваат уште по очигледни кога користиме јазици кои имаат различен начин на пишување, за повеќе околу проблемите од класичните начини на превод без корисење на неуронски мрежи можи да прочитате <a href="https://en.wikipedia.org/wiki/Statistical_machine_translation#Shortcomings">тука</a>.</p>
+
+<h3 id="клучеви-вредности">Клучеви, Вредности</h3>
+
+\[Vnimanie(Q, K, V) = \text{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V\]
+
+<h2 id="sentencepiece">SentencePiece:</h2>
+
+<h3 id="unigram">Unigram:</h3>
+
+<p>е алгоритам за токенизација на под-зборови, каде што претпоставката е дека појавата на токен е <strong>независна</strong> од било кој од другите токени кои се појавиле претходно.</p>
+
+<p><br /></p>
+
+<hr />
+
+<p><br /></p>
+
+<h2 id="тренирање">Тренирање:</h2>
+
+<p>Под процесот тренирање се мисли учење на невронската мрежа (трансформерот) да преведува текст.</p>
+
+<p>За овој чекор искористивме <a href="https://www.nvidia.com/en-us/geforce/graphics-cards/40-series/rtx-4090/">Nvidia графичка RTX 4090</a> со 24 GB VRAM.</p>
+
+<p>Моделот го трениравме 20 епохи, секоја епоха траеше околу еден час, после 20 епохи учење, моделот започна да покажува знаци на конвергенција (асимптотски паралелно со x оската).</p>
+
+<p><img src="/assets/images/valtrainlossepoch.png" alt="tokenizator" /></p>
+
+<p>За Validation Loss беше користено 10% од податоците, со фиксиран seed за репордукција (42). Причината за толку мал примерок е тоа што dataset-от е веќе мал, а 30% се премногу податоци да бидат надвор за валидација а не тренирање. Можеби и затоа се толку лоши резултатите.</p>
+
+<p>Според табелата која е прикажана како <strong>најдобар кандидат за инференца</strong> се покажа епоха 18, со најниска вредност на валидација, тажно е што вредностите се над 3.</p>
+
+<p>Претпоставуваме дека направивме грешка со learning-rate или грешка што искуството може само да ни ја открие, доколку некој поискусен знае слободно нека не корегира.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Epoch</th>
+      <th>Train Loss</th>
+      <th>Validation Loss</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>4.593</td>
+      <td>4.0319</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>4.526</td>
+      <td>3.9444</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>4.056</td>
+      <td>3.6089</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>3.852</td>
+      <td>3.4798</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>3.792</td>
+      <td>3.4891</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>3.759</td>
+      <td>3.3927</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>3.729</td>
+      <td>3.3943</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>3.747</td>
+      <td>3.3443</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>3.715</td>
+      <td>3.3782</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>3.718</td>
+      <td>3.3259</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>3.678</td>
+      <td>3.2844</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>3.634</td>
+      <td>3.2948</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>3.603</td>
+      <td>3.2525</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td>3.586</td>
+      <td>3.2174</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td>3.559</td>
+      <td>3.1606</td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td>3.535</td>
+      <td>3.2004</td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td>3.527</td>
+      <td>3.1526</td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td>3.505</td>
+      <td>3.1024</td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td>3.529</td>
+      <td>3.1507</td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td>3.546</td>
+      <td>3.1696</td>
+    </tr>
+    <tr>
+      <td>21</td>
+      <td>3.536</td>
+      <td>3.1309</td>
+    </tr>
+    <tr>
+      <td>22</td>
+      <td>3.521</td>
+      <td>3.1388</td>
+    </tr>
+    <tr>
+      <td>23</td>
+      <td>3.538</td>
+      <td>3.1521</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br /></p>
+
+<hr />
+
+<p><br /></p>
+
+<h2 id="архитектура-на-моделот">Архитектура на моделот</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Параметри</th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Македонски вокабулар</td>
+      <td>11,370</td>
+    </tr>
+    <tr>
+      <td>Англиски вокабулар</td>
+      <td>8,257</td>
+    </tr>
+    <tr>
+      <td>Големина на embedding</td>
+      <td>512</td>
+    </tr>
+    <tr>
+      <td>Број на глави за внимание</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <td>FFN скриен слој (FFN_HID_DIM)</td>
+      <td>512</td>
+    </tr>
+    <tr>
+      <td>Големина на batch (BATCH_SIZE)</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>Број на енкодер слоеви</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>Број на декодер слоеви</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br /></p>
+
+<hr />
+
+<p><br /></p>
+
+<h2 id="резултати">Резултати</h2>
+
+<p>Моделот е дефинитивно премал за реални апликации, со помали реченици добро се снаоѓа.</p>
+
+<h3 id="лимитации">Лимитации</h3>
+
+<ol>
+  <li>
+    <p><strong>би се ставиле ние авторите како лимитација</strong>, како почетници во оваа сфера, скоро 2 месеци лутавме по документации за да ги научиме основите, претпоставуваме дека имаме грешки при разбирање, имплементација, како и тренирање и валидација на моделот, но сметам дека <strong>следната верзија на моделот ќе биде помоќна и корисна.</strong>, дефинитивно има простор за подобрување.</p>
+  </li>
+  <li>
+    <p>Големината на Data-setот, 500 илјади пар реченици можеби звучат многу, но во пракса јазиците се покажуваат покомплексни од она што изгледаат на површина, дел од проблемот кои го воочивме е дека дури и моделите како GPT, Claude, LLAMA et al. ,** кои имаат десетици милијарди параметри<strong>,кои се тренирани на **петабајти</strong> податоци, имаат проблеми и потешкотии со македонскиот јазик, <strong>не дека нашиот јазик не е богат, туку причината се недостаток на податоци во кванитет</strong>, за вакви проекти се потребни квалитетни и квантитетни паралелни преводи.
+Дефинитивно би направиле огромен отскок, доколку моделот беше трениран да речиме од 1 до 10 милиони квалитетни реченици.</p>
+  </li>
+  <li>
+    <p>Како трета лимитација е пристапот до тренирање на хардвер, за овој проект потрошивме околу 20 евра на тренирање на моделот (за пристап до RTX 4090).</p>
+  </li>
+</ol>
+
+<h3 id="простор-за-подобрување">Простор за подобрување</h3>
+
+<p>Можеби е добро да се проба BERT архитектура или некоја сосема понова State Оf Тhe Аrt, која од една страна не бара голем број на податоци и не мора да се тренира од ништо, туку над неа со квалитетен Data-Set да се fine-тунира.</p>
+
+<h3 id="demo">Demo</h3>
+
+<p><a href="https://colab.research.google.com/github/najdovski-stefan/Donka-v1/blob/main/Donka_v1_Inference_seq2seq_mk_en-GOOGLE-COLAB.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Run on Colab" /></a></p>
+
+<div style="background-color: #ff0000; color: #ffffff; border: 1px solid #ffeeba; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+    <strong>⚠️  Предупредување:</strong>
+    <br />
+    <br />
+    Моделот е лиценциран под
+    <a href="https://www.creativecommons.org/licenses/by-nc/4.0/deed.en" target="_blank" style="color: #ffffff; text-decoration: underline;">
+        Creative Commons Attribution Non Commercial 4.0
+    </a>
+    <br />
+    <br />
+    Моделот **МОЖЕ** да се користи за едукативни цели и истражувачки цели.
+    <br />
+    <br />
+    Моделот **НЕ** може да биде користен во комерцијални продукти.
+</div>
+
+<p><br /></p>
+
+<hr />
+
+<p><br /></p>
+
+<h2 id="заклучок">Заклучок</h2>
+
+<p>Дефинитивно сметаме дека научивме и ја срушивме бариерата на илузија на моделите на Трансформери, бидејќи многу од нашите колеги и другари, имаат некој вид на страв и несигурност кон иднината, дека моделот наречен трансформер ќе започне да ги заменува со работни позиции, ние наспротив <strong>оптимистички гледаме</strong> дека потребата за луѓе и интелектуална работа ќе биде уште по интересна и достапна за секого. Оставаме на времето да ни покаже што понатака.</p>
+
+<h2 id="благодарност-до">Благодарност до:</h2>
+
+<p>Би сакале да изразиме посебна благодарност на следниве личности и институции, кои безусловно ни помогнаа и подржаја, без нив проектов не би постоел, од бесценети ресурси по македонски јазик, од песни, книги па се до вести, нашиот модел не би научил да преведи ниту една реченица, затоа би сакале да им се заблагодариме на следниве личности и институции:</p>
+
+<ul>
+  <li><a href="https://fikt.uklo.edu.mk/prof-d-r-kostandina-veljanovski/">Проф д-р Костандина Вељановска - ФИКТ - Битола</a>.</li>
+  <li><a href="https://fikt.uklo.edu.mk/darko-pajkovski/">М-р Дарко Пајковски - Асистент - ФИКТ - Битола</a>.</li>
+  <li><a href="https://drmj.manu.edu.mk/">Акад. Марјан Марковиќ - Дигитални ресурси на македонскиот јазик</a>.</li>
+  <li><a href="https://pelister.org/">Проф. д-р Георге Гоце Митревски - pelister.org</a>.</li>
+  <li><a href="https://time.mk/trajkovski/">Ph.D Игор Трајковски - time.mk</a>.</li>
+  <li><a href="https://pesna.org/">pesna.org</a>.</li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h3 id="литературареференци">Литература/Референци:</h3>
+<ul>
+  <li><a href="https://arxiv.org/pdf/1706.03762">Attention is All You need</a>.</li>
+  <li><a href="https://arxiv.org/pdf/2010.04903">What Do Position Embeddings Learn?</a></li>
+  <li><a href="https://jalammar.github.io/illustrated-transformer/">The Illustrated Transformer</a>.</li>
+  <li><a href="https://erdem.pl/2021/05/introduction-to-attention-mechanism">Kemal Erdem, (May 2021). “Introduction to Attention Mechanism”</a></li>
+  <li>[мал дел од dataset - ]</li>
+  <li><a href="https://theaisummer.com/positional-embeddings/">theaisummer.com - Positional Embeddings</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<p><br /></p>
+
+<h2 id="download">Download</h2>
+
+<ul>
+  <li><a href="https://huggingface.co/stefan-n/Donka-v1">Модел Donka v1 -  CC BY-NC 4.0 - Hugging Face </a>.</li>
+  <li><a href="">Изворен код - Github - Apache</a>.</li>
+  <li><a href="">Google Colab - Тестирање</a>.</li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<p><br /></p>
+
+<h2 id="корисна-литература-за-почетници-и-за-љубопитните">Корисна литература за почетници и за љубопитните:</h2>
+
+<p>Следниве ресурси се комплетно бесплатни и корисни за сите оние кои сакаат да научат кодирање, машинско учење, линеарна алгебра,веројатност и статистика.</p>
+
+<p>Зошто овие теми, бидејќи со помош на овие теми и вие ќе можите да тренирате и да ги разбирате невронските мрежи и вештачката интелигенција.</p>
+
+<ul>
+  <li><a href="https://hefferon.net/linearalgebra/">Линеарна Алгебра - Jim Hefferon - книга кој авторот ја нуди бесплатно</a>.</li>
+  <li><a href="https://rentry.org/machine-learning-roadmap">Целосен Roadmap за учење</a>.</li>
+  <li><a href="https://ocw.mit.edu/courses/6-100l-introduction-to-cs-and-programming-using-python-fall-2022/pages/material-by-lecture/">Научете Python од <strong>MIT</strong></a>.</li>
+  <li><a href="https://codeinplace.stanford.edu/">Научете Python Интеракивно - Курс од <strong>Stanford</strong></a>.</li>
+  <li><a href="https://cs50.harvard.edu/python/2022/weeks/0/">Научете Python - Курс од <strong>Harvard</strong></a>.</li>
+  <li><a href="https://immersivemath.com/ila/index.html">Научете <strong>Линеарна Алгебра визуелно</strong>, делот со операции за вектори и матрици е многу важен во машинското учење - <strong>Immersive Math</strong></a>.</li>
+  <li><a href="https://playground.tensorflow.org">Визуелно експериментирање со ** Tensorflow Deep Playground**</a>.</li>
+  <li><a href="https://www.3blue1brown.com/topics/neural-networks"><strong>3b1b</strong> - Невронски Мрежи</a>.</li>
+  <li><a href="https://youtu.be/qBigTkBLU6g?si=oTADX-oND-uB_FVA"><strong>StatQuest</strong> - Статистика</a>.</li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<p><br /></p>

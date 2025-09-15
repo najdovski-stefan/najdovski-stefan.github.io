@@ -1,7 +1,7 @@
 ---  
 layout: base
 title:  "PPM Формат на Слики"
-date:   2025-16-09 13:12:32 +0200
+date:   2025-09-16 13:12:32 +0200
 categories: basics
 author: Стефан Најдовски
    
